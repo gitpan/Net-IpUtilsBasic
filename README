@@ -1,0 +1,161 @@
+Net-IpUtilsBasic version 0.01
+=============================
+
+The README is used to introduce the module and provide instructions on
+how to install the module, any machine dependencies it may have (for
+example C compilers and installed libraries) and any other information
+that should be provided before the module is installed.
+
+A README file is required for CPAN modules since CPAN extracts the
+README file from a module distribution so that people browsing the
+archive can use it get an idea of the modules uses. It is usually a
+good idea to provide version information here so that people can
+decide whether fixes for the module are worth downloading.
+
+INSTALLATION
+
+To install this module type the following:
+
+   perl Makefile.PL
+   make
+   make test
+   make install
+
+NAME
+
+    Net::IPUtilsBasic - Common useful routines like converting decimal
+    address to binary and vice versa, determining address class, determining
+    default mask, subnets and hosts and broadcast addresses for hosts in
+    subnet.
+
+SYNOPSIS
+
+      use Net::IPUtilsBasic;                       ## subroutines isClassAddrA-E, bin2decIpAddr, dec2binIpAddr
+      use Net::IPUtilsBasic qw/:class/;            ## subroutines isClassAddrA-E, getAddrClass
+      use Net::IPUtilsBasic qw/:convert/;          ## subroutines bin2decIpAddr, dec2binIpAddr 
+      use Net::IPUtilsBasic qw/getAddrMaskDefault 
+                               getAddrClass
+                               isValidMask
+                               extendMaskByBits
+                               calcSubnetsNHosts
+                               getBroadcastAddr    ## Explicit inclusions
+
+      isClassAddrA('127.0.32.45',1);
+      isClassAddrA('00001111.11110010.00100100.10000001');
+
+      dec2binIpAddr('128.0.0.56');
+      bin2decIpAddr('10001000.10100001.00010101.00000001');
+
+      getAddrMaskDefault('124.45.0.0',1);
+      getAddrMaskDefault('10000000.00000001.01010101.10000001');
+
+      getAddrClass('124.45.0.0',1);
+      getAddrClass('00001111.11110010.00100100.10000001');
+
+      isValidMask('255.255.252.0',1);
+      isValidMask('11111111.00000000.00000000.00000000');
+
+      extendMaskByBits('255.255.0.0',2,1);
+      extendMaskByBits('11111111.00000000.00000000.00000000',2);
+
+      calcSubnetsNHosts('128.0.0.1',4,1);
+      calcSubnetsNHosts('10001000.10100001.00010101.00000001',4);
+                           
+      getBroadcastAddr('198.23.16.0','255.255.255.240','255.255.255.252',1);
+      getBroadcastAddr('10000000.00000001.01010101.10000001',
+                       '11111111.11111111.11111111.11110000',
+                       '11111111.11111111.11111111.11111100',);
+
+ABSTRACT
+
+      This module tries provide the basic functionalities related to IPv4 addresses.
+      Address class, subnet masks, subnet addresses, broadcast addresses can be deduced
+      using the given methods. Ip addresses passed are also validated implicitly.
+
+      Provision has been given to specify IP addresses in either dotted decimal notation
+      or dotted binary notation, methods have been provided for conversion to-from these
+      to notations which are internally used by other methods too.
+
+METHODS
+
+  isClassAddrA,isClassAddrB,isClassAddrC,isClassAddrD,isClassAddrE
+      isClassAddrA(<addr in decimal/binary>,<true if addr is decimal>) : returns 1 if true
+      eg.
+      isClassAddrA('127.0.32.45',1);
+      isClassAddrA('00001111.11110010.00100100.10000001');
+
+  dec2binIpAddr
+      dec2binIpAddr(<ip addr in dotted decimal notation>) : returns ip in binary dotted notation
+      eg.
+      dec2binIpAddr('128.0.0.56');
+
+  bin2decIpAddr
+      bin2decIpAddr(<ip addr in dotted binary notation>) : returns ip in decimal dotted notation
+      eg.
+      bin2decIpAddr('10001000.10100001.00010101.00000001');
+
+  getAddrMaskDefault
+      getAddrMaskDefault(<ip addr in decimal/binary notation>,<true if addr is decimal>) : returns default subnet mask in dotted decimal notation
+      eg.
+      getAddrMaskDefault('124.45.0.0',1); >> 255.0.0.0
+      getAddrMaskDefault('10000000.00000001.01010101.10000001'); >> 255.0.0.0
+
+  getAddrClass
+      getAddrClass(<ip addr in decimal/binary notation>,<true if addr is decimal>)) : returns class (A/B/C/D/E) of ip address
+      eg.  
+      getAddrClass('124.45.0.0',1);
+      getAddrClass('00001111.11110010.00100100.10000001');
+
+  isValidMask
+      isValidMask(<ip addr in decimal/binary notation>,<true if addr is decimal>)) : returns 1 if valid mask
+      eg.
+      isValidMask('255.255.252.0',1);
+      isValidMask('11111111.00000000.00000000.00000000');
+
+  extendMaskByBits
+      extendMaskByBits(<ip addr in decimal/binary notation>,<no.of bits to extend>,<true if addr is decimal>))
+        : returns mask after extending/turning on given no. of bits after the already on bits of the mask
+      eg.
+      extendMaskByBits('255.255.0.0',2,1); >> 255.255.192.0
+      extendMaskByBits('11111111.00000000.00000000.00000000',2); >> 11111111.11000000.00000000.00000000
+
+  calcSubnetsNHosts
+      calcSubnetsNHosts(ip addr in decimal/binary notation>,no. of borrowed bits,<true if addr is decimal>))
+        : returns (no. of subnets, no. of hosts)
+      eg.
+      calcSubnetsNHosts('128.0.0.1',4,1);
+      calcSubnetsNHosts('10001000.10100001.00010101.00000001',4);
+
+  getBroadcastAddr
+      getBroadcastAddr(<ip addr in decimal/binary notation>,
+                       <default mask in decimal/binary notation>,
+                       <subnet mask in decimal/binary notation>,
+                       <true if addr is decimal>) : returns broadcast addresses after subnetting as a list
+      eg.
+      getBroadcastAddr('198.23.16.0','255.255.255.240','255.255.255.252',1); >> ('198.23.16.0','198.23.16.4','198.23.16.8','198.23.16.12')
+      getBroadcastAddr('10000000.00000001.01010101.10000001',
+                       '11111111.11111111.11111111.11110000',
+                       '11111111.11111111.11111111.11111100',);
+
+CAVEAT
+
+      IPv4 only
+
+Similar Modules
+
+      Net::IP, Net::IpAddr etc.
+
+SUPPORT
+
+      debashish@cpan.org
+
+ACKNOWLEDGEMENTS
+
+COPYRIGHT & LICENSE
+
+    Copyright 2013 Debashish Parasar, all rights reserved.
+
+    This program is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself.
+
+
